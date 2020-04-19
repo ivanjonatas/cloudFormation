@@ -1,0 +1,61 @@
+Resources:  
+  Jenkins:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash
+            #instalando o docker e cia.
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -a -G docker ubuntu
+            docker run --name jenkins -p 8080:8080 -p 50000:50000 -d jenkins/jenkins
+            docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword > key.txt
+      ImageId: ami-***********
+      KeyName: NomeDaChaveDeAcesso
+      SecurityGroupIds: 
+        - sg-***
+      Tags:
+        - Key: Name
+          Value: jenkins
+  Rancher:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash
+            #instalando o docker e cia.
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -a -G docker ubuntu
+            docker run -d --restart=unless-stopped -p 8080:8080 rancher/server
+      ImageId: ami-***********
+      KeyName: NomeDaChaveDeAcesso
+      SecurityGroupIds: 
+        - sg-***
+      Tags:
+        - Key: Name
+          Value: Rancher
+  SlaveRancher:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash
+            #instalando o docker e cia.
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -a -G docker ubuntu
+      ImageId: ami-***********
+      KeyName: NomeDaChaveDeAcesso
+      SecurityGroupIds: 
+        - sg-***
+      Tags:
+        - Key: Name
+          Value: SlaveRancher
